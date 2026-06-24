@@ -2,7 +2,7 @@
 
 A loot split calculator for YunaMS expedition bosses. Enter what dropped and how many people are in the run, and it splits the loot by share value so everyone gets a fair cut.
 
-**Live:** https://dizn0.github.io/loot-distributor/
+**Live:** https://dizn0.github.io/loot-ledger/
 
 ## Bosses
 
