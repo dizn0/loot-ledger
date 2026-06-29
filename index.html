@@ -162,9 +162,6 @@
     background:transparent; color:var(--ice); border:1px solid rgba(212,175,55,.4); cursor:pointer; transition:all .15s;}
   .modetoggle button.on{background:linear-gradient(180deg, rgba(212,175,55,.28), rgba(212,175,55,.07)); color:var(--gold-l); border-color:var(--gold);}
   .modehint{max-width:520px; margin:-10px auto 16px; text-align:center; color:var(--steel); font-size:12px; line-height:1.5;}
-  .distopt{display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; font-family:'Fredoka','Nunito',sans-serif; font-size:13.5px; color:var(--ice); cursor:pointer; margin:-6px 0 18px;}
-  .distopt input{width:16px; height:16px; accent-color:var(--gold); cursor:pointer;}
-  .distopt .hint{color:var(--steel); font-size:12.5px;}
   .draftrow.active{background:rgba(212,175,55,.10); border-radius:8px; margin:0 -8px; padding-left:8px; padding-right:8px;}
   .aitem,.aitem-s{display:inline-flex; align-items:center; gap:2px; background:rgba(143,208,238,.08);
     border:1px solid rgba(143,208,238,.3); border-radius:6px; padding:2px 7px; font-size:14px; color:var(--ice-l);}
@@ -657,7 +654,7 @@ function calc(){
       <div class="num">${fmtVal(si.share)}<span class="unit">${unitWord(si.share)}</span></div>
       <div class="note">${note}</div>`;
     if(leftover > 0){
-      shareBox.innerHTML += `<div class="leftover"><b>Leftover: ${fmtVal(leftover)} ${unitWord(leftover)}.</b> Doesn't divide evenly across ${remaining} players. Use the <b>Sample Distribution</b> below (flip on <b>Distribute remainder</b>) to push it down the roll order, or leave it to the host's call.</div>`;
+      shareBox.innerHTML += `<div class="leftover"><b>Leftover: ${fmtVal(leftover)} ${unitWord(leftover)}.</b> Doesn't divide evenly across ${remaining} players, so the <b>Sample Distribution</b> below pushes it down the roll order (top rollers get the extra).</div>`;
     }
   } else {
     shareBox.innerHTML = `<div class="note warn">Every player already won a high-value roll. Split the rest by group call.</div>`;
@@ -671,7 +668,7 @@ let DRAFT_MODE = false;
 let MODE = 'standard';
 let DRAFT = null;
 let CTX = null;
-let DISTRIBUTE_REMAINDER = false;
+let DISTRIBUTE_REMAINDER = true;  // always distribute remainder down the roll order
 let LAST = null;   // snapshot of the most recent distribution, for the shareable card
 const chipImg = id => ICON[id] ? `<img class="iico" src="${ICON[id]}" alt="" title="${NAME[id]}">` : '';
 
@@ -693,10 +690,6 @@ function renderDistro(members, winnerItems, restUnits, restValue){
     <button class="${MODE==='draft'?'on':''}" onclick="setMode('draft')">Draft it yourself</button>
   </div>`;
   html += `<div class="modehint">${MODE==='draft' ? 'Draft it yourself: assign each item by hand down the roll order.' : MODE==='modern' ? (BOSS.modernHint||'') : (BOSS.stdHint||'')}</div>`;
-
-  if(!DRAFT_MODE){
-    html += `<label class="distopt"><input type="checkbox" ${DISTRIBUTE_REMAINDER?'checked':''} onchange="setDistRemainder(this.checked)"> Distribute remainder <span class="hint">(push leftovers down the roll order instead of a host pool)</span></label>`;
-  }
 
   if(numWinners > 0){
     html += '<div class="distro-block"><div class="distro-h">High-value winners (sit out the rest)</div>';
@@ -873,7 +866,6 @@ function renderItemsKeepCounts(){
   loadPrices();
 }
 function setMode(m){ MODE=m; DRAFT_MODE=(m==='draft'); applyVal(); if(m!=='draft') DRAFT=null; renderItemsKeepCounts(); calc(); }
-function setDistRemainder(on){ DISTRIBUTE_REMAINDER = on; refreshDistro(); }
 function refreshDistro(){ if(CTX) renderDistro(CTX.members, CTX.winnerItems, CTX.restUnits, CTX.restValue); }
 function draftAssign(id){
   const D = DRAFT; if(!D) return;
