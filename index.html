@@ -161,6 +161,7 @@
   .modetoggle button{font-family:'Fredoka','Nunito',sans-serif; font-size:13px; letter-spacing:1px; padding:7px 16px; border-radius:8px;
     background:transparent; color:var(--ice); border:1px solid rgba(212,175,55,.4); cursor:pointer; transition:all .15s;}
   .modetoggle button.on{background:linear-gradient(180deg, rgba(212,175,55,.28), rgba(212,175,55,.07)); color:var(--gold-l); border-color:var(--gold);}
+  .modehint{max-width:520px; margin:-10px auto 16px; text-align:center; color:var(--steel); font-size:12px; line-height:1.5;}
   .distopt{display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; font-family:'Fredoka','Nunito',sans-serif; font-size:13.5px; color:var(--ice); cursor:pointer; margin:-6px 0 18px;}
   .distopt input{width:16px; height:16px; accent-color:var(--gold); cursor:pointer;}
   .distopt .hint{color:var(--steel); font-size:12.5px;}
@@ -479,12 +480,14 @@ const FALLBACK_PRICES = {
 const BOSSES = {
   empress: { key:'empress', status:'live', eyebrow:'Empress Cygnus', title:'Loot Split Calculator',
     cardEyebrow:'Empress Cygnus', members:8,
-    items:ITEMS_EMPRESS, groups:GROUPS_EMPRESS, prio:PRIO_EMPRESS, icons:ICON_EMPRESS, desc:DESC_EMPRESS,
+    items:ITEMS_EMPRESS, groups:GROUPS_EMPRESS, prio:PRIO_EMPRESS, icons:ICON_EMPRESS, desc:DESC_EMPRESS, modern:{ws:1, cs:1},
+    stdHint:'Standard: long-term share values (scrolls hold value, Diamonds drift down over time).', modernHint:'Modern: White &amp; Chaos Scroll count the same as a Diamond, closer to current spot prices.',
     shareNote:'scrolls hold value as a stable currency, while Diamond prices may drift down over time.',
     guideHtml:'Part of the <a href="https://yuna.ms/forum/index.php?threads/empress-cygnus-a-new-bossers-and-hosters-guide-to-the-frozen-throne-loot-calculator.825/" target="_blank" rel="noopener">Empress Cygnus guide</a> on the YunaMS forum. Questions or feedback on the calculator or guide? Drop a reply there. <span class="spk">\u2726</span>' },
   pinkbean: { key:'pinkbean', status:'live', eyebrow:'Pink Bean', title:'Loot Split Calculator',
     cardEyebrow:'Pink Bean', members:6,
-    items:ITEMS_PINKBEAN, groups:GROUPS_PINKBEAN, prio:PRIO_PINKBEAN, icons:ICON_PINKBEAN, desc:DESC_PINKBEAN,
+    items:ITEMS_PINKBEAN, groups:GROUPS_PINKBEAN, prio:PRIO_PINKBEAN, icons:ICON_PINKBEAN, desc:DESC_PINKBEAN, modern:{ws:1, cs:1},
+    stdHint:'Standard: long-term share values, counted in Rock of Time.', modernHint:'Modern: White &amp; Chaos Scroll count the same as a Rock of Time.',
     shareNote:'everything is counted in <b>Rock of Time</b> (RoT), the run\'s base currency, a 1-point item is worth one RoT, a 2 is two, and a 0.5 is half.',
     note:'<b>Card (optional):</b> if anyone in the run still needs the Monster Card, roll it before PB dies; top roll wins it and is <b>still eligible</b> for everything below. if everyone already has it, no roll needed. Shares are counted in <b>Rock of Time</b>. <b>Basic Dark Crystal</b> (1-3) is usually kept by the host.',
     guideHtml:'Pink Bean guide coming soon. Spot a wrong drop or want different share weights? Ping dizno. <span class="spk">\u2726</span>' },
@@ -493,7 +496,7 @@ const BOSSES = {
 };
 
 let ITEMS = ITEMS_EMPRESS, GROUPS = GROUPS_EMPRESS, PRIO = PRIO_EMPRESS, ICON = ICON_EMPRESS;
-let NAME = {}, VAL = {}, DESC = {}, BOSS = BOSSES.empress, ACTIVE = 'empress';
+let NAME = {}, VAL = {}, VAL_BASE = {}, MODERN_OV = {}, DESC = {}, BOSS = BOSSES.empress, ACTIVE = 'empress';
 
 function foldHtml(note){
   return `<b>What shares are.</b> Each item is worth a set number of shares (the diamond next to it). The split adds up all the shares and divides them evenly among the players still in the roll. Share values reflect an item's lasting worth, not just current spot price: ${note}<br><br><b>How loot gets handed out.</b> The SSS single-roll items are rolled on their own first, and those winners sit out the rest. The share above is each player's <b>point target</b>: going by roll order (highest first), the top roller picks items up to their share, then the next, and so on. Other hosts run it differently; some do a single roll for everything (top rollers take the big items, loot continues down the order), and some skip the tiers entirely and treat every item as equal value to keep distribution simple. Either way, loot distribution is ultimately the <b>host's preferred method</b>, so check how yours runs it.`;
@@ -516,8 +519,10 @@ function setBoss(key){
   if(calcbody) calcbody.style.display='';
   BOSS=b; ITEMS=b.items; GROUPS=b.groups; PRIO=b.prio||{}; ICON=b.icons||{}; DESC=b.desc||{};
   NAME={}; ITEMS.forEach(it=>NAME[it.id]=it.name);
-  VAL={};  ITEMS.forEach(it=>VAL[it.id]=it.val);
-  DRAFT=null; LAST=null; CTX=null; DRAFT_MODE=false;
+  VAL_BASE={}; ITEMS.forEach(it=>VAL_BASE[it.id]=it.val);
+  MODERN_OV = b.modern || {};
+  MODE='standard'; DRAFT_MODE=false; applyVal();
+  DRAFT=null; LAST=null; CTX=null;
   const mem=document.getElementById('members'); if(mem) mem.value = b.members||8;
   const banner=document.getElementById('draftbanner');
   if(banner){
@@ -545,9 +550,9 @@ let html='';
 GROUPS.forEach(g=>{
   html += `<div class="section-title">${g.title} <span>${g.sub}</span></div>`;
   ITEMS.filter(it=>it.group===g.key).forEach(it=>{
-    const t=tierOf(it.val);
+    const t=tierOf(VAL[it.id]);
     const badgeClass = t===3?'b3 sss':t===2?'b2':t===1?'b1':'bh';
-    const badgeTxt = t===3 ? 'SSS' : fmtVal(it.val);
+    const badgeTxt = t===3 ? 'SSS' : fmtVal(VAL[it.id]);
     const badgeTitle = t===3 ? ' title="Won in a separate roll, so SSS items are not part of the point split."' : '';
     const tierClass  = 'tier'+(t==='h'?'h':t);
     html += `<div class="item ${tierClass}${it.cap1?' cap1':''}">
@@ -606,10 +611,11 @@ function calc(){
       sepList.push(`${c}\u00D7 ${it.name}`);
       for(let i=0;i<c;i++) winnerItems.push(it.id);
     } else {
-      const v = c*it.val;
+      const uv = VAL[it.id];
+      const v = c*uv;
       restValue += v;
-      restBreak.push(`${c}\u00D7 ${it.name} (${fmtVal(it.val)} ea) = ${fmtVal(v)}`);
-      for(let i=0;i<c;i++) restUnits.push({id:it.id, value:it.val, prio:(PRIO[it.id]||0)});
+      restBreak.push(`${c}\u00D7 ${it.name} (${fmtVal(uv)} ea) = ${fmtVal(v)}`);
+      for(let i=0;i<c;i++) restUnits.push({id:it.id, value:uv, prio:(PRIO[it.id]||0)});
     }
   });
 
@@ -662,6 +668,7 @@ function calc(){
 }
 
 let DRAFT_MODE = false;
+let MODE = 'standard';
 let DRAFT = null;
 let CTX = null;
 let DISTRIBUTE_REMAINDER = false;
@@ -681,9 +688,11 @@ function renderDistro(members, winnerItems, restUnits, restValue){
   html += `<p class="distro-note">One fair way the ${members}-player split could land. Equal-value items are interchangeable, so the real picks are up to the players, this is just an example.</p>`;
 
   html += `<div class="modetoggle">
-    <button class="${DRAFT_MODE?'':'on'}" onclick="setDraftMode(false)">Auto</button>
-    <button class="${DRAFT_MODE?'on':''}" onclick="setDraftMode(true)">Draft it yourself</button>
+    <button class="${MODE==='standard'?'on':''}" onclick="setMode('standard')">Standard</button>
+    <button class="${MODE==='modern'?'on':''}" onclick="setMode('modern')">Modern</button>
+    <button class="${MODE==='draft'?'on':''}" onclick="setMode('draft')">Draft it yourself</button>
   </div>`;
+  html += `<div class="modehint">${MODE==='draft' ? 'Draft it yourself: assign each item by hand down the roll order.' : MODE==='modern' ? (BOSS.modernHint||'') : (BOSS.stdHint||'')}</div>`;
 
   if(!DRAFT_MODE){
     html += `<label class="distopt"><input type="checkbox" ${DISTRIBUTE_REMAINDER?'checked':''} onchange="setDistRemainder(this.checked)"> Distribute remainder <span class="hint">(push leftovers down the roll order instead of a host pool)</span></label>`;
@@ -856,7 +865,14 @@ function renderDraft(){
   };
 }
 
-function setDraftMode(on){ DRAFT_MODE = on; if(!on) DRAFT = null; refreshDistro(); }
+function applyVal(){ VAL = (MODE==='modern') ? Object.assign({}, VAL_BASE, MODERN_OV) : VAL_BASE; }
+function renderItemsKeepCounts(){
+  const saved={}; ITEMS.forEach(it=>{const e=document.getElementById('cnt_'+it.id); if(e) saved[it.id]=e.value;});
+  renderItems();
+  ITEMS.forEach(it=>{const e=document.getElementById('cnt_'+it.id); if(e && saved[it.id]!=null) e.value=saved[it.id];});
+  loadPrices();
+}
+function setMode(m){ MODE=m; DRAFT_MODE=(m==='draft'); applyVal(); if(m!=='draft') DRAFT=null; renderItemsKeepCounts(); calc(); }
 function setDistRemainder(on){ DISTRIBUTE_REMAINDER = on; refreshDistro(); }
 function refreshDistro(){ if(CTX) renderDistro(CTX.members, CTX.winnerItems, CTX.restUnits, CTX.restValue); }
 function draftAssign(id){
@@ -897,7 +913,7 @@ function buildCardHTML(){
   let h = '<div class="sharecard" id="sharecard">';
   h += '<img class="brandlogo sclogo" src="'+LOGO+'" alt="YunaMS">';
   h += `<div class="sc-eyebrow">${BOSS.cardEyebrow}</div><div class="sc-title">Loot Split</div>`;
-  h += `<div class="sc-sub">${L.members}-player run \u00B7 ${date}${L.draft?' \u00B7 hand-drafted':''}</div>`;
+  h += `<div class="sc-sub">${L.members}-player run \u00B7 ${date}${L.draft?' \u00B7 hand-drafted':''}${MODE==='modern'?' \u00B7 Modern values':''}</div>`;
   h += `<div class="sc-share"><div class="l">Each player gets</div><div class="n">${fmtVal(L.share)}<span class="unit">${unitWord(L.share)}</span></div></div>`;
   if(L.winners.length){
     h += '<div class="sc-sec">Rolled separately</div>';
