@@ -413,7 +413,7 @@ const ITEMS_PINKBEAN = [
   {id:'mw20',   name:"Maple Warrior 20",          val:1,   sep:false, group:'consum', def:0, max:5,  cap1:false},
   {id:'glove',  name:"Any Glove",                 val:0.5, sep:false, group:'gear', def:0, max:10, cap1:false},
   {id:'overall',name:"Any Overall",               val:0.5, sep:false, group:'gear', def:0, max:10, cap1:false},
-  {id:'tlpend', name:"Timeless Pendant",          val:2,   sep:false, group:'pend', def:0, max:5,  cap1:false},
+  {id:'tlpend', name:"Timeless Pendant",          val:1,   sep:false, group:'pend', def:0, max:5,  cap1:false},
   {id:'lpend',  name:"Locked Timeless Pendant",   val:1,   sep:false, group:'pend', def:0, max:5,  cap1:false},
 ];
 const GROUPS_PINKBEAN = [
@@ -474,6 +474,100 @@ const FALLBACK_PRICES = {
   rot:22000000, mw30:150000000, mw20:20000000, coc:30000000, tlpend:50000000, lpend:28000000
 };
 
+// ---- Magnus / Lotus (Maglot) config ----
+// Convention + prices from CDawg (Chris). Each boss drops 10 of its own
+// Core/Shard, handed out top-down (6-man = 2/2/2/2/1/1). ADC + stat crystals
+// always drop; accessories and gems are ~20% each and several different ones
+// can drop in one run, so the host enters what actually dropped. UMP + River
+// Essence + powders + plates are near-zero value, divided evenly per player.
+// Values anchored on WS/CS = 1 (about 40m): Lotus Core 20, Magnus Shard 5.
+// Market IDs still PROVISIONAL; tune via @market and @whodrops.
+
+const ITEMS_MAGNUS = [
+  {id:'mshard',name:"Magnus Shard",                   val:5,    sep:false, group:'guar', def:10, max:30, cap1:false},
+  {id:'adc',   name:"Advanced Dark Crystal",          val:1.5,  sep:false, group:'guar', def:1,  max:20, cap1:false},
+  {id:'cry',   name:"Advanced Stat Crystals",         val:0.4,  sep:false, group:'guar', def:4,  max:20, cap1:false},
+  {id:'lcore', name:"Lotus Core (extra)",             val:20,   sep:false, group:'roll', def:0,  max:30, cap1:false},
+  {id:'acc',   name:"Accessory (Eye/Face/Earring)",   val:10,   sep:false, group:'roll', def:0,  max:5,  cap1:false},
+  {id:'vit',   name:"Scroll of Arcane Vitality 60%",  val:8,    sep:false, group:'roll', def:0,  max:5,  cap1:false},
+  {id:'amp',   name:"Arcane Amplification Scroll 75%",val:8,    sep:false, group:'roll', def:0,  max:5,  cap1:false},
+  {id:'ame',   name:"Amethyst",                       val:1.8,  sep:false, group:'roll', def:0,  max:10, cap1:false},
+  {id:'opal',  name:"Opal",                           val:1.4,  sep:false, group:'roll', def:0,  max:10, cap1:false},
+  {id:'cs',    name:"Chaos Scroll (CS)",              val:1,    sep:false, group:'roll', def:0,  max:10, cap1:false},
+  {id:'ws',    name:"White Scroll (WS)",              val:1,    sep:false, group:'roll', def:0,  max:10, cap1:false},
+  {id:'gem',   name:"Other Advanced Gems (~30m)",     val:0.8,  sep:false, group:'roll', def:0,  max:20, cap1:false},
+  {id:'ump',   name:"Universal Magic Powder",         val:0.004,sep:false, group:'cap',  def:0,  max:99, cap1:false},
+  {id:'re',    name:"River Essence",                  val:0.013,sep:false, group:'cap',  def:0,  max:99, cap1:false},
+  {id:'pow',   name:"Magic Powders (any color)",      val:0.003,sep:false, group:'cap',  def:0,  max:99, cap1:false},
+  {id:'plate', name:"Plates (any color)",             val:0.006,sep:false, group:'cap',  def:0,  max:99, cap1:false},
+];
+const ITEMS_LOTUS = [
+  {id:'lcore', name:"Lotus Core",                     val:20,   sep:false, group:'guar', def:10, max:30, cap1:false},
+  {id:'adc',   name:"Advanced Dark Crystal",          val:1.5,  sep:false, group:'guar', def:1,  max:20, cap1:false},
+  {id:'cry',   name:"Advanced Stat Crystals",         val:0.4,  sep:false, group:'guar', def:4,  max:20, cap1:false},
+  {id:'mshard',name:"Magnus Shard (extra)",           val:5,    sep:false, group:'roll', def:0,  max:30, cap1:false},
+  {id:'acc',   name:"Accessory (Eye/Face/Earring)",   val:10,   sep:false, group:'roll', def:0,  max:5,  cap1:false},
+  {id:'vit',   name:"Scroll of Arcane Vitality 60%",  val:8,    sep:false, group:'roll', def:0,  max:5,  cap1:false},
+  {id:'amp',   name:"Arcane Amplification Scroll 75%",val:8,    sep:false, group:'roll', def:0,  max:5,  cap1:false},
+  {id:'ame',   name:"Amethyst",                       val:1.8,  sep:false, group:'roll', def:0,  max:10, cap1:false},
+  {id:'opal',  name:"Opal",                           val:1.4,  sep:false, group:'roll', def:0,  max:10, cap1:false},
+  {id:'cs',    name:"Chaos Scroll (CS)",              val:1,    sep:false, group:'roll', def:0,  max:10, cap1:false},
+  {id:'ws',    name:"White Scroll (WS)",              val:1,    sep:false, group:'roll', def:0,  max:10, cap1:false},
+  {id:'gem',   name:"Other Advanced Gems (~30m)",     val:0.8,  sep:false, group:'roll', def:0,  max:20, cap1:false},
+  {id:'ump',   name:"Universal Magic Powder",         val:0.004,sep:false, group:'cap',  def:0,  max:99, cap1:false},
+  {id:'re',    name:"River Essence",                  val:0.013,sep:false, group:'cap',  def:0,  max:99, cap1:false},
+  {id:'pow',   name:"Magic Powders (any color)",      val:0.003,sep:false, group:'cap',  def:0,  max:99, cap1:false},
+  {id:'plate', name:"Plates (any color)",             val:0.006,sep:false, group:'cap',  def:0,  max:99, cap1:false},
+];
+const GROUPS_MAGLOT = [
+  {key:'guar', title:'Guaranteed Drops', sub:'10 Cores/Shards + Dark Crystal + stat crystals every run'},
+  {key:'roll', title:'Variable Drops', sub:'about 20% each, enter what dropped, claimed in roll order'},
+  {key:'cap',  title:'Split Per Player', sub:'UMP, essence, powders, plates, near-zero value, divided evenly'},
+];
+const PRIO_MAGNUS = { lcore:15, acc:14, vit:13, amp:12, mshard:11, ame:10, adc:9, opal:8, cs:7, ws:6, gem:5, cry:4, re:3, ump:2, plate:1, pow:0 };
+const PRIO_LOTUS  = { lcore:15, acc:14, vit:13, amp:12, mshard:11, ame:10, adc:9, opal:8, cs:7, ws:6, gem:5, cry:4, re:3, ump:2, plate:1, pow:0 };
+const ICON_MAGNUS = {}; // no custom icons yet -> diamond placeholder
+const ICON_LOTUS  = {}; // no custom icons yet -> diamond placeholder
+
+const DESC_MAGNUS = {
+  mshard: `<b class="tt-h">Magnus Shard (~200m, 5 WS/CS)</b>The Magnus run backbone. 10 drop per kill, handed out top-down (6-man: 2/2/2/2/1/1). Worth about 5 WS/CS, well above the gems, so not interchangeable with Opal/Amethyst.`,
+  lcore: `<b class="tt-h">Lotus Core (extra, ~800m)</b>A Lotus Core that drops in a Magnus run. Top value in the pile at about 20 WS/CS.`,
+  acc: `<b class="tt-h">Accessory (Eye/Face/Earring) ~400m</b>About 20% to drop, and 2-3 different ones can drop in one run, so enter each. Confirm the exact accessory via @whodrops.`,
+  vit: `<b class="tt-h">Scroll of Arcane Vitality (60%) ~330m</b>Armor enhancement scroll. Top of the roll order.`,
+  amp: `<b class="tt-h">Arcane Amplification Scroll (75%) ~330m</b>Weapon scroll, +10 W.ATK / +20 M.ATK and +4 all stats.`,
+  ame: `<b class="tt-h">Amethyst (~70m)</b>Advanced gem, about 20% to drop.`,
+  opal: `<b class="tt-h">Opal (~55m)</b>Advanced gem, about 20% to drop.`,
+  adc: `<b class="tt-h">Advanced Dark Crystal (~60m)</b>Always drops. All stats +0-5 crafting gem.`,
+  cry: `<b class="tt-h">Advanced Stat Crystals (~15m ea)</b>Power / Dex / Luk / Wisdom crystals, always drop.`,
+  cs: `<b class="tt-h">Chaos Scroll (~40m)</b>Shifts every stat -5 to +5. The share anchor unit.`,
+  ws: `<b class="tt-h">White Scroll (~40m)</b>Protects an upgrade slot on a failed scroll. The share anchor unit.`,
+  gem: `<b class="tt-h">Other Advanced Gems (~30m ea)</b>Black Crystal, Diamond, Sapphire, Garnet, Aquamarine, Topaz, Emerald. Count how many of these 30m-tier gems dropped.`,
+  ump: `<b class="tt-h">Universal Magic Powder (~150k ea)</b>Bulk mat, divided evenly per player.`,
+  re: `<b class="tt-h">River Essence (~500k ea)</b>Bulk mat, divided evenly per player.`,
+  pow: `<b class="tt-h">Magic Powders (~100k ea)</b>Any color, divided evenly per player.`,
+  plate: `<b class="tt-h">Plates (~250k ea)</b>Any color, divided evenly per player.`,
+};
+const DESC_LOTUS = {
+  lcore: `<b class="tt-h">Lotus Core (~800m, 20 WS/CS)</b>The Lotus run backbone. 10 drop per kill, handed out top-down (6-man: 2/2/2/2/1/1). Top value by a wide margin.`,
+  mshard: `<b class="tt-h">Magnus Shard (extra, ~200m)</b>A Magnus Shard that drops in a Lotus run. About 5 WS/CS, well above the gems.`,
+  acc: `<b class="tt-h">Accessory (Eye/Face/Earring) ~400m</b>About 20% to drop, and 2-3 different ones can drop in one run, so enter each. Confirm the exact accessory via @whodrops.`,
+  vit: `<b class="tt-h">Scroll of Arcane Vitality (60%) ~330m</b>Armor enhancement scroll. Top of the roll order.`,
+  amp: `<b class="tt-h">Arcane Amplification Scroll (75%) ~330m</b>Weapon scroll, +10 W.ATK / +20 M.ATK and +4 all stats.`,
+  ame: `<b class="tt-h">Amethyst (~70m)</b>Advanced gem, about 20% to drop.`,
+  opal: `<b class="tt-h">Opal (~55m)</b>Advanced gem, about 20% to drop.`,
+  adc: `<b class="tt-h">Advanced Dark Crystal (~60m)</b>Always drops. All stats +0-5 crafting gem.`,
+  cry: `<b class="tt-h">Advanced Stat Crystals (~15m ea)</b>Power / Dex / Luk / Wisdom crystals, always drop.`,
+  cs: `<b class="tt-h">Chaos Scroll (~40m)</b>Shifts every stat -5 to +5. The share anchor unit.`,
+  ws: `<b class="tt-h">White Scroll (~40m)</b>Protects an upgrade slot on a failed scroll. The share anchor unit.`,
+  gem: `<b class="tt-h">Other Advanced Gems (~30m ea)</b>Black Crystal, Diamond, Sapphire, Garnet, Aquamarine, Topaz, Emerald. Count how many of these 30m-tier gems dropped.`,
+  ump: `<b class="tt-h">Universal Magic Powder (~150k ea)</b>Bulk mat, divided evenly per player.`,
+  re: `<b class="tt-h">River Essence (~500k ea)</b>Bulk mat, divided evenly per player.`,
+  pow: `<b class="tt-h">Magic Powders (~100k ea)</b>Any color, divided evenly per player.`,
+  plate: `<b class="tt-h">Plates (~250k ea)</b>Any color, divided evenly per player.`,
+};
+
+const _maglotNote = 'Each boss drops <b>10</b> of its own Core/Shard, handed out top-down (6-man: <b>2/2/2/2/1/1</b>). <b>Enter exactly what dropped:</b> gems and accessories are not guaranteed and several different ones can drop in one run, so add each. Roughly 20% per gem/accessory; <b>Dark Crystal + stat crystals</b> always drop. <b>UMP, River Essence, powders and plates</b> are near-zero value and split evenly per player. Everything else is claimed in roll order, with the bottom Core/Shard rollers getting first pick to even out value. Values are current spot (Chris): 1 share is about one WS/CS (~40m), a Lotus Core 20, a Magnus Shard 5. This calc splits by total value; tune weights via @market.';
+
 const BOSSES = {
   empress: { key:'empress', status:'live', eyebrow:'Empress Cygnus', title:'Loot Split Calculator',
     cardEyebrow:'Empress Cygnus', members:8,
@@ -488,6 +582,7 @@ const BOSSES = {
     shareNote:'everything is counted in <b>Rock of Time</b> (RoT), the run\'s base currency, a 1-point item is worth one RoT, a 2 is two, and a 0.5 is half.',
     note:'<b>Card (optional):</b> if anyone in the run still needs the Monster Card, roll it before PB dies; top roll wins it and is <b>still eligible</b> for everything below. if everyone already has it, no roll needed. Shares are counted in <b>Rock of Time</b>. <b>Basic Dark Crystal</b> (1-3) is usually kept by the host.',
     guideHtml:'Pink Bean guide coming soon. Spot a wrong drop or want different share weights? Ping dizno. <span class="spk">\u2726</span>' },
+  // magnus/lotus config staged above (ITEMS_MAGNUS/ITEMS_LOTUS etc.); flip status to 'live' + restore full entry to re-enable.
   magnus: { key:'magnus', status:'soon', eyebrow:'Magnus', title:'Loot Split Calculator', blurb:'Magnus loot split is on the way.' },
   lotus:  { key:'lotus',  status:'soon', eyebrow:'Lotus',  title:'Loot Split Calculator', blurb:'Lotus loot split is on the way.' },
 };
@@ -518,7 +613,7 @@ function setBoss(key){
   NAME={}; ITEMS.forEach(it=>NAME[it.id]=it.name);
   VAL_BASE={}; ITEMS.forEach(it=>VAL_BASE[it.id]=it.val);
   MODERN_OV = b.modern || {};
-  MODE='standard'; DRAFT_MODE=false; applyVal();
+  MODE='modern'; DRAFT_MODE=false; applyVal();
   DRAFT=null; LAST=null; CTX=null;
   const mem=document.getElementById('members'); if(mem) mem.value = b.members||8;
   const banner=document.getElementById('draftbanner');
@@ -665,7 +760,7 @@ function calc(){
 }
 
 let DRAFT_MODE = false;
-let MODE = 'standard';
+let MODE = 'modern';
 let DRAFT = null;
 let CTX = null;
 let DISTRIBUTE_REMAINDER = true;  // always distribute remainder down the roll order
@@ -685,8 +780,8 @@ function renderDistro(members, winnerItems, restUnits, restValue){
   html += `<p class="distro-note">One fair way the ${members}-player split could land. Equal-value items are interchangeable, so the real picks are up to the players, this is just an example.</p>`;
 
   html += `<div class="modetoggle">
-    <button class="${MODE==='standard'?'on':''}" onclick="setMode('standard')">Standard</button>
     <button class="${MODE==='modern'?'on':''}" onclick="setMode('modern')">Modern</button>
+    <button class="${MODE==='standard'?'on':''}" onclick="setMode('standard')">Standard</button>
     <button class="${MODE==='draft'?'on':''}" onclick="setMode('draft')">Draft it yourself</button>
   </div>`;
   html += `<div class="modehint">${MODE==='draft' ? 'Draft it yourself: assign each item by hand down the roll order.' : MODE==='modern' ? (BOSS.modernHint||'') : (BOSS.stdHint||'')}</div>`;
